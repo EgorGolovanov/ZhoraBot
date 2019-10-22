@@ -1,4 +1,6 @@
 ﻿using System;
+using SchoolApplication.DataBase;
+using ZhoraBot.Repository;
 
 namespace ZhoraBot
 {
