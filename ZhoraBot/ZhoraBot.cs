@@ -5,6 +5,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
@@ -30,8 +31,8 @@ namespace ZhoraBot
                 .AddSingleton(_commands)
                 .BuildServiceProvider();
 
-            string botToken = "NjM0Mzk4MTk4MTgxMzk2NTEx.XbcUgQ.EAGVZ7eVJIWB62nNSZKi0tT6Ayg";
-
+            string botToken = File.ReadAllText("../../botToken.txt");
+                
             _client.Log += Log;
 
             await RegisterCommandAsync();
