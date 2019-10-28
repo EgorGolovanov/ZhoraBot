@@ -8,7 +8,14 @@ namespace ZhoraBot
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Hello World!");
+            try
+            {
+                new ZhoraBot().RunBotAsync().GetAwaiter().GetResult();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
         }
     }
 }
