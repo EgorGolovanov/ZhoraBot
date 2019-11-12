@@ -1,4 +1,5 @@
-﻿using Discord.Commands;
+﻿using Discord;
+using Discord.Commands;
 using Discord.WebSocket;
 using System;
 using System.Collections.Generic;
@@ -11,56 +12,61 @@ namespace ZhoraBot.Services
     class CommandHandler
     {
         private DiscordSocketClient _client;
-        private CommandService _commands; 
+        private CommandService _commands;
+        private IServiceProvider _services;
 
-        // Retrieve client and CommandService instance via ctor
-        public CommandHandler(DiscordSocketClient client, CommandService commands)
+
+        public async Task InitializeAsync(DiscordSocketClient client)
         {
-            _commands = commands;
             _client = client;
+            _commands = new CommandService();
+
+            await RegisterCommandAsync();
         }
 
-        public async Task InstallCommandsAsync()
+        /// <summary>
+        /// выписываем сообщения об ошибках и тд. 
+        /// </summary>
+        /// <param name="arg"></param>
+        /// <returns></returns>
+        private Task Log(LogMessage arg)
         {
-            // Hook the MessageReceived event into our command handler
+            Console.WriteLine(arg);
+
+            return Task.CompletedTask;
+        }
+
+        /// <summary>
+        /// добавляем все команды 
+        /// </summary>
+        /// <returns></returns>
+        public async Task RegisterCommandAsync()
+        {
             _client.MessageReceived += HandleCommandAsync;
-
-            // Here we discover all of the command modules in the entry 
-            // assembly and load them. Starting from Discord.NET 2.0, a
-            // service provider is required to be passed into the
-            // module registration method to inject the 
-            // required dependencies.
-            //
-            // If you do not use Dependency Injection, pass null.
-            // See Dependency Injection guide for more information.
-            await _commands.AddModulesAsync(assembly: Assembly.GetEntryAssembly(),
-                                            services: null);
+            await _commands.AddModulesAsync(Assembly.GetEntryAssembly(), _services);
         }
 
-        private async Task HandleCommandAsync(SocketMessage messageParam)
+        /// <summary>
+        /// упраление командами (проверка на префикс перед командой, отлов сообщений от самого бота, выполнение команды)
+        /// </summary>
+        /// <param name="arg"></param>
+        /// <returns></returns>
+        private async Task HandleCommandAsync(SocketMessage arg)
         {
-            // Don't process the command if it was a system message
-            var message = messageParam as SocketUserMessage;
-            if (message == null) return;
+            var message = arg as SocketUserMessage;
+            if (message is null || message.Author.IsBot) return;
 
-            // Create a number to track where the prefix ends and the command begins
             int argPos = 0;
 
-            // Determine if the message is a command based on the prefix and make sure no bots trigger commands
-            if (!(message.HasCharPrefix('!', ref argPos) ||
-                message.HasMentionPrefix(_client.CurrentUser, ref argPos)) ||
-                message.Author.IsBot)
-                return;
+            if (message.HasStringPrefix("!", ref argPos) || message.HasMentionPrefix(_client.CurrentUser, ref argPos))
+            {
+                var context = new SocketCommandContext(_client, message);
 
-            // Create a WebSocket-based command context based on the message
-            var context = new SocketCommandContext(_client, message);
+                var result = await _commands.ExecuteAsync(context, argPos, _services);
 
-            // Execute the command with the command context we just
-            // created, along with the service provider for precondition checks.
-            await _commands.ExecuteAsync(
-                context: context,
-                argPos: argPos,
-                services: null);
+                if (!result.IsSuccess)
+                    Console.WriteLine(result.ErrorReason);
+            }
         }
     }
 }

@@ -19,25 +19,24 @@ namespace ZhoraBot
         private DiscordSocketClient _client;
         private CommandService _commands;
         private IServiceProvider _services;
-
+        //private CommandHandler _handler;
 
         public async Task RunBotAsync()
         {
             _client = new DiscordSocketClient();
             _commands = new CommandService();
-
             _services = new ServiceCollection()
                 .AddSingleton(_client)
                 .AddSingleton(_commands)
                 .BuildServiceProvider();
-
-            string botToken = File.ReadAllText("../../botToken.txt");
                 
             _client.Log += Log;
 
             await RegisterCommandAsync();
 
-            await _client.LoginAsync(TokenType.Bot, botToken);
+            
+
+            await _client.LoginAsync(TokenType.Bot, Config.GetBotToken());
 
             //запускаем бота
             await _client.StartAsync();
@@ -79,7 +78,7 @@ namespace ZhoraBot
 
             int argPos = 0;
 
-            if (message.HasStringPrefix("!", ref argPos) || message.HasMentionPrefix(_client.CurrentUser, ref argPos))
+            if (message.HasStringPrefix(Config.GetCommandPrefix(), ref argPos) || message.HasMentionPrefix(_client.CurrentUser, ref argPos))
             {
                 var context = new SocketCommandContext(_client, message);
 
