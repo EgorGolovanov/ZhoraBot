@@ -3,70 +3,83 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace ZhoraBot.Utilities
 {
     class DescriptionCommands
     {
         private const string configFolder = "Resources";
-        private const string configFile = "help.json";
+        private const string configFile = "CommandDescription.json";
 
-        private Command command;
-       // private List<Command> commands;
+        private List<Command> commands;
 
-        public string GetCommandName()
+        public List<Command> GetCommandsDescriptions()
         {
-            return command.name;
+            return commands;
         }
 
-        public string GetCommandParameters()
+        private void AddCommand(Command command)
         {
-            return command.parameters;
+            if (commands.FindIndex(p => p.name == command.name) != -1) return;
+
+            commands.Add(command);
+
+            string json = JsonConvert.SerializeObject(commands, Formatting.Indented);
+
+            File.WriteAllText(configFolder + "/" + configFile, json);
+
         }
 
-        public string GetCommandDecription()
+        public async Task AddCommandAsync(Command command)
         {
-            return command.description;
-        }
-
-        public void AddCommand(string commandName, string parameters, string description)
-        {
-            command = new Command()
+            await Task.Run(delegate()
             {
-                name = commandName,
-                parameters = parameters,
-                description = description
-            };
-            string json = JsonConvert.SerializeObject(command, Formatting.Indented);
+                if (commands == null) commands = new List<Command>();
 
-            File.AppendAllText(configFolder + "/" + configFile, json);
+                if (commands.FindIndex(p => p.name == command.name) == -1)
+                {
 
+                    commands.Add(command);
+
+                    string json = JsonConvert.SerializeObject(commands, Formatting.Indented);
+
+                    File.WriteAllText(configFolder + "/" + configFile, json);
+                }
+
+            });
         }
+
 
         public DescriptionCommands()
         {
-            if (!Directory.Exists(configFolder))
-                Directory.CreateDirectory(configFolder);
+            if (!Directory.Exists(configFolder)) Directory.CreateDirectory(configFolder);
 
             if (!File.Exists(configFolder + "/" + configFile))
             {
-                command = new Command();
-                string json = JsonConvert.SerializeObject(command, Formatting.Indented);
-                File.WriteAllText(configFolder + "/" + configFile, json);
+                File.WriteAllText(configFolder + "/" + configFile, "");
             }
             else
             {
                 string json = File.ReadAllText(configFolder + "/" + configFile);
-                command = JsonConvert.DeserializeObject<Command>(json);
+
+                commands = JsonConvert.DeserializeObject<List<Command>>(json);
             }
         }
     }
 
-    public struct Command
+    public  struct Command
     {
         public string name;
-        public string parameters;
-        public string description;
+        public Description description;
     }
+
+    public struct Description
+    {
+        public List<string> parameters;
+        public string description;
+        public List<string> roles;
+    }
+
 
 }

@@ -43,34 +43,37 @@ namespace ZhoraBot.Modules
             }
         }
 
-        [Command("createVoiceChanell")]
-        public async Task CreateVoiceChanell([Remainder] string nameChanell = "")
+        [Command("createVoiceChannel")]
+        public async Task CreateVoiceChannel([Remainder] string nameChanell = "")
         {
             var user = Context.User as SocketGuildUser;
 
-            var chanell = await user.Guild.CreateVoiceChannelAsync(nameChanell);
+            var channel = await user.Guild.CreateVoiceChannelAsync(nameChanell);
 
         }
 
-        [Command("createTextChanell")]
-        public async Task CreateTextChanell([Remainder] string nameChanell = "")
+        [Command("createTextChannel")]
+        [Remarks("создает текстовый канал. Команд доступна для администраторов и учителей")]
+        public async Task CreateTextChannel([Remainder] string nameChanell = "")
         {
             var user = Context.User as SocketGuildUser;
 
-            var chanell = await user.Guild.CreateTextChannelAsync(nameChanell);
+            var channel = await user.Guild.CreateTextChannelAsync(nameChanell);
 
+            
         }
 
-        [Command("deleteChanell")]
-        public async Task DeleteChanell([Remainder] string nameChanell = "")
+        [Command("deleteChannel")]
+        public async Task DeleteChannel([Remainder] string nameChannel = "")
         {
             var user = Context.User as SocketGuildUser;
 
             var chanells = user.Guild.Channels;
 
-            var deletedChanell =  chanells.FirstOrDefault(p => p.Name == nameChanell);
+            var deletedChannel =  chanells.FirstOrDefault(p => p.Name == nameChannel);
 
-            if (deletedChanell != null) await deletedChanell.DeleteAsync();
+            if (deletedChannel != null) await deletedChannel.DeleteAsync();
+
         }
 
         /// <summary>
@@ -81,44 +84,85 @@ namespace ZhoraBot.Modules
         /// <returns> true or false </returns>
         private bool RoleMembership(SocketGuildUser user, string role)
         {
-            var result = from r in user.Guild.Roles
-                         where r.Name == role
-                         select r.Id;
+            var User = Context.User as SocketGuildUser;
+            var Role = Context.Guild.Roles.FirstOrDefault(x => x.Name == role);
+
+            return User.Roles.Contains(Role);
+
+            //var result = from r in user.Guild.Roles
+            //             where r.Name == role
+            //             select r.Id;
             
-            var roleID = result.FirstOrDefault();
+            //var roleID = result.FirstOrDefault();
             
-            if (roleID == 0) return false;
+            //if (roleID == 0) return false;
             
-            var targetRole = user.Guild.GetRole(roleID);
+            //var targetRole = user.Guild.GetRole(roleID);
             
-            return user.Roles.Contains(targetRole);
+            //return user.Roles.Contains(targetRole);
+        }
+
+
+        [Command("AddDescriptionCommand")]
+        [RequireUserPermission(GuildPermission.Administrator)]
+        private async Task AddDescriptionCommand()
+        {
+            var contentsList = new List<string>();
+
+            var command = new DescriptionCommands();
+
+            using (var client = new HttpClient())
+            {
+                var content = await client.GetStringAsync(Context.Message.Attachments.First().Url);
+                
+                contentsList = content.Split("\r\n").ToList();
+            }
+
+            for (int i = 0; i < contentsList.Count; i += 4)
+            {
+                await command.AddCommandAsync(new Command()
+                {
+                    name = contentsList[i],
+                    description = new Description()
+                    {
+                        parameters = contentsList[i + 1].Split(' ').ToList(),
+                        description = contentsList[i + 2],
+                        roles = contentsList[i + 3].Split(' ').ToList()
+                    }
+                });
+            }
         }
 
         [Command("newCategory")]
         public async Task CreateCategory([Remainder] string nameCategory = "")
         {
             var user = Context.User as SocketGuildUser;
+            
             if (nameCategory == "") return;
+            
             await user.Guild.CreateCategoryChannelAsync(nameCategory);
         }
 
-        [Command("moveChanell")]
-        public async Task MoveChanell(string nameChanell = "", string nameCategory = "")
+        [Command("moveChannel")]
+        public async Task MoveChannel(string nameChannel = "", string nameCategory = "")
         {
             var user = Context.User as SocketGuildUser;
-            var chanells = user.Guild.Channels;
+            
+            var channels = user.Guild.Channels;
+            
             var categories = user.Guild.CategoryChannels;
-            var movedChanell = chanells.FirstOrDefault(p => p.Name == nameChanell);
+            
+            var movedChannel = channels.FirstOrDefault(p => p.Name == nameChannel);
 
             var categoriesID = from c in categories
                              where c.Name == nameCategory
                              select c.Id;
+            
             var categoryID = categoriesID.FirstOrDefault();
 
-
-            if (movedChanell != null && categoryID != 0)
+            if (movedChannel != null && categoryID != 0)
             {
-                await movedChanell.ModifyAsync(delegate (GuildChannelProperties properties) { properties.CategoryId = categoryID; });
+                await movedChannel.ModifyAsync(delegate (GuildChannelProperties properties) { properties.CategoryId = categoryID; });
             }
         }
         
@@ -136,8 +180,10 @@ namespace ZhoraBot.Modules
                 
                 //var stream = await client.GetStreamAsync(Context.Message.Attachments.First().Url);
                 
-                if (!String.IsNullOrEmpty(content)) await ReplyAsync("Я получил твой файл) Сейчас проверю его и скаже тебе результат))");
-                else await ReplyAsync("Так, так так, СТОП! Проверь-ка свой файл еще раз, возможно он пустой или что-то пошло не так при загрузке))\nСтоит попробовать отправить еще разок)))");
+                if (!String.IsNullOrEmpty(content)) 
+                    await ReplyAsync("Я получил твой файл) Сейчас проверю его и скаже тебе результат))");
+                else 
+                    await ReplyAsync("Так, так так, СТОП! Проверь-ка свой файл еще раз, возможно он пустой или что-то пошло не так при загрузке))\nСтоит попробовать отправить еще разок)))");
             }
 
             // проверка домашней работы 
