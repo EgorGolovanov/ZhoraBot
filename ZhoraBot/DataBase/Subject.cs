@@ -9,7 +9,7 @@ namespace SchoolApplication.DataBase
     /// <summary>
     /// класс представляющий учебную дисциплину
     /// </summary>
-    public class Subject : ISubject
+    public class Subject// : ISubject
     {
         
         /// <summary>
@@ -25,9 +25,9 @@ namespace SchoolApplication.DataBase
         /// </summary>
         public List<Student> Students { get; set; }
         /// <summary>
-        /// преподаватель предмета
+        /// преподаватели предмета
         /// </summary>
-        public Teacher Teacher { get; set; }
+        public List<Teacher> Teacher { get; set; }
         /// <summary>
         /// список конкурсов для предмета
         /// </summary>
@@ -43,6 +43,6 @@ namespace SchoolApplication.DataBase
         /// <summary>
         /// учебные материалы к занятиям
         /// </summary>
-        public List<ClassWorkContent> ClassWorkContent { get; set; }
+    //    public Content Content { get; set; }
     }
 }

@@ -9,7 +9,9 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using System.IO;
 using ZhoraBot.Utilities;
+using ZhoraBot.Models;
 using System.Net.Http;
+using System.Text.RegularExpressions;
 
 namespace ZhoraBot.Modules
 {
@@ -18,6 +20,10 @@ namespace ZhoraBot.Modules
         [Command("hello")]
         public async Task HelloAsync()
         {
+            HomeworkConfig homework = new HomeworkConfig();
+            
+            homework.CheckHomework("kek");
+
             await ReplyAsync("Привет, пидор!");
         }
 
@@ -25,8 +31,15 @@ namespace ZhoraBot.Modules
         public async Task HelpCommand()
         {
             var helper = new DescriptionCommands();
+
+            var commands = helper.GetCommandsDescriptions();
+
+            foreach(var elem in commands)
+            {
+                await ReplyAsync($"Команда: !{elem.name}\nОписание команды: {elem.description.description}\n");
+            }
+
             
-            await ReplyAsync("Не помогу! Пошел нахуй!");
         }
 
         [Command("getListRole")]
@@ -54,11 +67,15 @@ namespace ZhoraBot.Modules
 
         [Command("createTextChannel")]
         [Remarks("создает текстовый канал. Команд доступна для администраторов и учителей")]
+        [RequireUserPermission(GuildPermission.Administrator)]
         public async Task CreateTextChannel([Remainder] string nameChanell = "")
         {
             var user = Context.User as SocketGuildUser;
-
+           
             var channel = await user.Guild.CreateTextChannelAsync(nameChanell);
+
+            var serverRoles = (user as IGuildUser).Guild.Roles;
+
 
             
         }
@@ -82,24 +99,23 @@ namespace ZhoraBot.Modules
         /// <param name="user"> юзер для проверки </param>
         /// <param name="role"> название роли </param>
         /// <returns> true or false </returns>
-        private bool RoleMembership(SocketGuildUser user, string role)
+        private bool RoleMembership(SocketGuildUser user, List<string> roles)
         {
             var User = Context.User as SocketGuildUser;
-            var Role = Context.Guild.Roles.FirstOrDefault(x => x.Name == role);
 
-            return User.Roles.Contains(Role);
+            var commandDescription = new DescriptionCommands();
 
-            //var result = from r in user.Guild.Roles
-            //             where r.Name == role
-            //             select r.Id;
+            SocketRole Role;
             
-            //var roleID = result.FirstOrDefault();
-            
-            //if (roleID == 0) return false;
-            
-            //var targetRole = user.Guild.GetRole(roleID);
-            
-            //return user.Roles.Contains(targetRole);
+            foreach (var role in roles)
+            {
+                Role = Context.Guild.Roles.FirstOrDefault(x => x.Name == role);
+                
+                if (User.Roles.Contains(Role)) return true;
+            }
+
+            return false;
+
         }
 
 
@@ -125,9 +141,9 @@ namespace ZhoraBot.Modules
                     name = contentsList[i],
                     description = new Description()
                     {
-                        parameters = contentsList[i + 1].Split(' ').ToList(),
+                        parameters = contentsList[i + 1].Split('\t').ToList(),
                         description = contentsList[i + 2],
-                        roles = contentsList[i + 3].Split(' ').ToList()
+                        roles = contentsList[i + 3].Split('\t').ToList()
                     }
                 });
             }
@@ -172,21 +188,49 @@ namespace ZhoraBot.Modules
         /// <returns></returns>
         [Command("sendHomework")]
         [RequireContext(ContextType.DM)]
-        public async Task SendHomework()
+        public async Task SendHomework([Remainder] string homeworkName)
         {
+            var attach = Context.Message.Attachments.First();
+
             using (var client = new HttpClient())
             {
-                var content = await client.GetStringAsync(Context.Message.Attachments.First().Url);
+                     
+                if (!attach.Filename.EndsWith(".txt"))
+                {
+                    await ReplyAsync("Домашняя работа обрабатывается только в формате \".txt\". Пожалуйста попробуй еще раз с правильным расширением файла.");
                 
-                //var stream = await client.GetStreamAsync(Context.Message.Attachments.First().Url);
+                    return;
+                }
                 
-                if (!String.IsNullOrEmpty(content)) 
+                var content = await client.GetStringAsync(attach.Url);
+
+                if (!String.IsNullOrEmpty(content))
                     await ReplyAsync("Я получил твой файл) Сейчас проверю его и скаже тебе результат))");
-                else 
+                else
                     await ReplyAsync("Так, так так, СТОП! Проверь-ка свой файл еще раз, возможно он пустой или что-то пошло не так при загрузке))\nСтоит попробовать отправить еще разок)))");
+
+                using (var db = new ZhoraDBContext())
+                {
+                    //придуумать как правильно выбирать по названию нужную дз
+                    var homeworks = db.Content
+                                      .Where(p => p.ContentType == "ДЗ" && p.SourcePath.EndsWith(homeworkName + ".txt"))
+                                      .ToList();
+
+                    if (homeworks == null)
+                    {
+                        await ReplyAsync("Возможно, у меня нет этой домашней работы.\nПожалуйста посмотри все условия для сдачи работы в канале \"ТАКОМ ТО\" и попробуй еще раз.");
+                        return;
+                    }
+                    
+                    var answerForHomework = await client.GetStringAsync(homeworks.First().AnswerPath);
+
+
+                }
+                
             }
 
             // проверка домашней работы 
+            
 
             //сохранить под новым именем (с указанием имени ученика и предмета) и отправить в беседу менторов или преподов
             

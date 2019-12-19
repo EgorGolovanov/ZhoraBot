@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Data.Entity;
+
 
 namespace SchoolApplication.DataBase
 {
@@ -43,5 +43,14 @@ namespace SchoolApplication.DataBase
         /// роль ученика
         /// </summary>
         public Role Role { get; set; }
+
+        /// <summary>
+        /// позиция в рейтинге
+        /// </summary>
+        public int PositionOfRating { get; set; }
+        /// <summary>
+        /// расписание для учеников
+        /// </summary>
+        public Schedule Schedule { get; set; }
     }
 }

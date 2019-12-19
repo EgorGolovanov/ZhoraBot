@@ -14,17 +14,20 @@ namespace SchoolApplication.DataBase
         /// идентификатор
         /// </summary>
         public Guid Id { get; set; }
+        
         /// <summary>
         /// методист, составивший домашнюю работу
         /// </summary>
         public Methodist Methodist { get; set; }
-        /// <summary>
-        /// контент к домашней работе
-        /// </summary>
-        public List<HomeworkContent> HomeworkContent { get; set; }
-        /// <summary>
-        /// ответы к домашней работе
-        /// </summary>
-        public List<AnswersForContent> AnswerList { get; set; }
+        
+        ///// <summary>
+        ///// контент к домашней работе
+        ///// </summary>
+        //public List<HomeworkContent> HomeworkContent { get; set; }
+        
+        ///// <summary>
+        ///// ответы к домашней работе
+        ///// </summary>
+        //public List<AnswersForContent> AnswerList { get; set; }
     }
 }

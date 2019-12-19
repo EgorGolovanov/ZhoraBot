@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Data.Entity;
 using SchoolApplication.DataBase.Interface;
 namespace SchoolApplication.DataBase
 {
@@ -22,7 +21,7 @@ namespace SchoolApplication.DataBase
         /// <summary>
         /// список курсов которые ведет преподаватель
         /// </summary>
-        public List<Course> Courses { get; set; }
+        public List<Subject> Subjects { get; set; }
         /// <summary>
         /// контактная информация
         /// </summary>
@@ -31,5 +30,14 @@ namespace SchoolApplication.DataBase
         /// роль преподавателя
         /// </summary>
         public Role Role { get; set; }
+
+        /// <summary>
+        /// начало рабочего дня
+        /// </summary>
+        public DateTime StartWork { get; set; }
+        /// <summary>
+        /// конец рабочего дня
+        /// </summary>
+        public DateTime EndWork { get; set; }
     }
 }

@@ -23,9 +23,9 @@ namespace SchoolApplication.DataBase
         /// </summary>
         public List<Subject> Subjects { get; set; }
         /// <summary>
-        /// преподаватель курса
+        /// преподаватели курса
         /// </summary>
-        public Teacher Teacher { get; set; }
+        public List<Teacher> Teacher { get; set; }
 
     }
 }

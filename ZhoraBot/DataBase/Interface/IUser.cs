@@ -14,10 +14,12 @@ namespace SchoolApplication.DataBase
         /// идентификатор
         /// </summary>
         Guid Id { get; set; }
+        
         /// <summary>
         /// имя пользователя
         /// </summary>
         string DiscordName { get; set; }
+       
         /// <summary>
         /// роль пользователя
         /// </summary>

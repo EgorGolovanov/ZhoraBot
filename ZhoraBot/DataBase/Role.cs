@@ -19,5 +19,7 @@ namespace SchoolApplication.DataBase
         /// </summary>
         public string RoleName { get; set; }
 
+
+        public bool Administrator { get; set; }
     }
 }

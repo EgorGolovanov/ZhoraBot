@@ -14,10 +14,12 @@ namespace SchoolApplication.DataBase
         /// идентификартор
         /// </summary>
         public Guid Id { get; set; }
+        
         /// <summary>
-        /// название файла вопроса
+        /// файл вопросов/вопроса
         /// </summary>
         public string FileName { get; set; }
+
         /// <summary>
         /// ответ на вопрос
         /// </summary>

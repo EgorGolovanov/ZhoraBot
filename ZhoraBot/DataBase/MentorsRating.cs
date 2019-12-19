@@ -8,7 +8,7 @@ namespace SchoolApplication.DataBase
     /// <summary>
     /// класс представляющий рейтинговую таблицу наставников
     /// </summary>
-    public class MentorsRating : IRating<Mentor>
+    public class MentorsRating// : IRating<Mentor>
     {
         /// <summary>
         /// идентификатор
@@ -17,7 +17,7 @@ namespace SchoolApplication.DataBase
         /// <summary>
         /// список наставников
         /// </summary>
-        public List<Mentor> RatingList { get; set; }
+        public Mentor RatingList { get; set; }
         /// <summary>
         /// позиция в рейтинге
         /// </summary>

@@ -18,9 +18,6 @@ namespace SchoolApplication.DataBase
         /// список учеников
         /// </summary>
         public List<Student> Students { get; set; }
-        /// <summary>
-        /// расписание для учеников
-        /// </summary>
-        public Schedule Schedule { get; set; }
+
     }
 }

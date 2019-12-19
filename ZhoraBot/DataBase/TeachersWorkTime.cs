@@ -9,7 +9,7 @@ namespace SchoolApplication.DataBase
     /// <summary>
     /// класс представляющий рабочий день для преподавателей
     /// </summary>
-    public class TeachersWorkTime : IWorkTime
+    public class TeachersWorkTime// : IWorkTime
     {
         /// <summary>
         /// идентификатор
@@ -19,13 +19,6 @@ namespace SchoolApplication.DataBase
         /// преподаватель
         /// </summary>
         public Teacher Teacher { get; set; }
-        /// <summary>
-        /// начало рабочего дня
-        /// </summary>
-        public DateTime StartWork { get; set; }
-        /// <summary>
-        /// конец рабочего дня
-        /// </summary>
-        public DateTime EndWork { get; set; }
+
     }
 }

@@ -14,10 +14,12 @@ namespace SchoolApplication.DataBase
         /// идентификатор
         /// </summary>
         public Guid Id { get; set; }
+        
         /// <summary>
         /// список ролей для учатия в лотерее
         /// </summary>
         public List<Role> Roles { get; set; }
+        
         /// <summary>
         /// приз лотереи
         /// </summary>

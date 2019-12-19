@@ -26,6 +26,20 @@ namespace SchoolApplication.DataBase
         /// <summary>
         /// средняя оценка наставника (полученная от учеников)
         /// </summary>
-        public double AverageRating { get; set; }
+        public double Rating { get; set; }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public int VotedPeople { get; set; }
+
+        /// <summary>
+        /// начало рабочего дня
+        /// </summary>
+        public DateTime StartWork { get; set; }
+        /// <summary>
+        /// конец рабочего дня
+        /// </summary>
+        public DateTime EndWork { get; set; }
     }
 }

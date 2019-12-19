@@ -14,10 +14,7 @@ namespace SchoolApplication.DataBase
         /// идентификатор
         /// </summary>
         public Guid Id { get; set; }
-        /// <summary>
-        /// список ролей которые могут получить расписание
-        /// </summary>
-        public List<Role> Roles { get; set; }
+
         /// <summary>
         /// расписание бесплатного контента
         /// </summary>
